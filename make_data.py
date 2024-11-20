@@ -1,30 +1,29 @@
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 
 # Step 1: Specify the model name or path
 model_name = "deepseek-ai/DeepSeek-Coder-V2-Instruct"  # Replace with the path to your model or Hugging Face repo name
 
 # Step 2: Load the model and tokenizer
 print("Loading model and tokenizer...")
-tokenizer = AutoTokenizer.from_pretrained(model_name)
+tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
+quantization_config = BitsAndBytesConfig(load_in_8bit=True)
 model = AutoModelForCausalLM.from_pretrained(
     model_name,
-    device_map="auto",           # Automatically selects the appropriate device (GPU/CPU)
-    torch_dtype="auto",          # Uses the optimal data type for your hardware
-    load_in_8bit=True            # Optional: Load in 8-bit precision to save memory
+    device_map="auto",
+    torch_dtype="auto",
+    quantization_config=quantization_config,
+    trust_remote_code=True
 )
 
 # Step 3: Define the function to ask a question
 def ask_question(question):
-    # Tokenize the input question
-    inputs = tokenizer(question, return_tensors="pt").to("cuda")  # Move inputs to GPU if available
-    # Generate the answer
-    outputs = model.generate(inputs["input_ids"], max_length=200)  # Adjust max_length as needed
-    # Decode and return the answer
+    inputs = tokenizer(question, return_tensors="pt").to("cuda")
+    outputs = model.generate(inputs["input_ids"], max_length=200)
     answer = tokenizer.decode(outputs[0], skip_special_tokens=True)
     return answer
 
 # Step 4: Ask a specific question
-question = "What is the capital of France?"  # Replace with your own question
+question = "how do you reverse an array in python?"
 print(f"Question: {question}")
 answer = ask_question(question)
 print(f"Answer: {answer}")
