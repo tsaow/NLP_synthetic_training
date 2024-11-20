@@ -42,7 +42,13 @@ for file_name in os.listdir(folder_path):
                 )
                 model_inputs = tokenizer([text], return_tensors="pt").to(model.device)
 
-                generated_ids = model.generate(**model_inputs, max_new_tokens=512)
+                generated_ids = model.generate(
+                    **model_inputs,
+                    max_new_tokens=512
+                )
+                generated_ids = [
+                    output_ids[len(input_ids):] for input_ids, output_ids in zip(model_inputs.input_ids, generated_ids)
+                ]
 
                 response = tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
                 print(response)
