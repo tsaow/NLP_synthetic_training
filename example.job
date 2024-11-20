@@ -4,7 +4,7 @@
 #SBATCH --time=02:00:00
 #SBATCH --cpus-per-task=8
 #SBATCH --mem=32GB
-#SBATCH --gres=gpu:1
+#SBATCH --gres=gpu:a100:1
 #SBATCH --account=jessetho_1390
 #SBATCH --output=%j_output.log
 #SBATCH --error=%j_error.log
@@ -22,7 +22,8 @@ conda activate torch_env
 
 # Install PyTorch and related packages
 conda install pytorch==2.5.0 torchvision==0.20.0 torchaudio==2.5.0 pytorch-cuda=11.8 -c pytorch -c nvidia -y
-conda install conda-forge::transformers -y
+pip install transformers
+pip install accelerate
 
 # Run your Python script
 python make_data.py
