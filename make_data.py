@@ -1,3 +1,4 @@
+import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 
 # Step 1: Specify the model name or path
@@ -6,10 +7,19 @@ model_name = "meta-llama/Meta-Llama-3-70B"  # Replace with the path to your mode
 # Step 2: Load the model and tokenizer
 print("Loading model and tokenizer...")
 tokenizer = AutoTokenizer.from_pretrained(model_name, trust_remote_code=True)
-quantization_config = BitsAndBytesConfig(load_in_8bit=True)
+
+# Modified quantization config to fall back to CPU if CUDA setup fails
+try:
+    quantization_config = BitsAndBytesConfig(load_in_8bit=True)
+    device = "cuda"
+except RuntimeError:
+    print("Warning: CUDA setup failed, falling back to CPU (this will use much more memory)")
+    quantization_config = None
+    device = "cpu"
+
 model = AutoModelForCausalLM.from_pretrained(
     model_name,
-    device_map="auto",
+    device_map="auto" if device == "cuda" else None,
     torch_dtype="auto",
     quantization_config=quantization_config,
     trust_remote_code=True
