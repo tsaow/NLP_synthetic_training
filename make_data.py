@@ -1,7 +1,7 @@
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
 
 # Step 1: Specify the model name or path
-model_name = "deepseek-ai/DeepSeek-Coder-V2-Instruct"  # Replace with the path to your model or Hugging Face repo name
+model_name = "meta-llama/Meta-Llama-3-70B"  # Replace with the path to your model or Hugging Face repo name
 
 # Step 2: Load the model and tokenizer
 print("Loading model and tokenizer...")
